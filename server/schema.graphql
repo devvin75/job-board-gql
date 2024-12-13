@@ -1,0 +1,38 @@
+#the graphql extension tells the editor that this is GraphQl Schema definition language file
+
+#is a special object type that defines all the "read-only" entry points for your API.
+#This is where you specify all the queries that clients can execute to fetch data. 
+type Query {
+    #FETCH A "SINGLE" job
+    #id is the name of the argument and ID! is the type and Job is the return type
+    job(id: ID!): Job 
+    jobs:[Job!]
+   
+}
+
+"""Custom object type """
+type Company{
+    id: ID!
+    name: String!
+    description: String
+}
+
+"""
+OBJECT ASSOCIATION
+Associate each job with the company
+"""
+#This defines what a job entry looks like. 
+#Think of it as a blueprint for a job.
+type Job {
+    id:ID!     
+    title: String!
+    company: Company!
+    """ This is called a documentation comment"""
+    # If type is int, its going to be converted to a very long number that is very difficult to read.
+    # String is formatting the date according to the ISO standard. (ISO 8601)    
+    date: String! 
+    description: String
+}
+
+
+

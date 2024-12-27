@@ -12,6 +12,7 @@ function HomePage() {
     // getJobs().then((jobs) => setJobs(jobs));
     getJobs().then(setJobs);
   }, []);
+  
   // console.log('[HomePage] jobs: ', jobs)
   return (
     <div>

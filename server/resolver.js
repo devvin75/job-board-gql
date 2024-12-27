@@ -1,18 +1,15 @@
 /**Resolvers are responsble for fetching the data for "EACH" field in the schema */
 
-import {getJobs} from './db/jobs.js';
+import {getJobs, getJob} from './db/jobs.js';
 import {getCompany} from './db/companies.js'; // replace with actual company logic
 
 export const resolvers = {
     Query:{
-        /**root: often called paren or obj
+        /**root: often called parent or obj
          * represents the result returned from the resolver on the parent field
-         */
-        job: (_root, args) => {
-            console.log('[Query.job] args: ', args);
-             return null;
-        },
-
+         * the args parameter has beed destructured to {id}         */
+        job: (_root, {id}) => getJob(id),
+            // console.log('[Query.job] args: ', id);   
         jobs: () => getJobs(),
     },
 

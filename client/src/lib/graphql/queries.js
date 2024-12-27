@@ -3,7 +3,26 @@ import { GraphQLClient, gql } from "graphql-request";
 // CREATING A GRAPHQL client instance.
 const client = new GraphQLClient('http://localhost:9000/graphql');
 
-// FETCH DATA
+// FETCH SPECIFIC DATA
+export async function getJob(id){
+  const query = gql`
+    query JobById($id: ID!) {
+      job(id)
+      id
+      date
+      title
+      company{
+        id
+        name
+      }
+      description
+    }
+  `;
+
+}
+
+
+// FETCH ALL DATA (JOBS) 
 export async function getJobs() {
     // this is a graphQL query
     /**the gql tag  function is commonly used with GraphQL libraries

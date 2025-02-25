@@ -1,0 +1,13 @@
+In React, a component lifecycle refers to the "series of events" that 
+a component goes through to from it's creation to it's destruction
+
+I.)Mounting
+   --the initial phase when the component is CREATED and ADDED to the DOM
+   --the component is born, it learns its sorroundings(DOM) and then
+     it starts to exist on the screen.
+
+II.)Updating
+    --this phase occurs when the component's props or state change
+
+III.)Unmounting
+     --This phase occurs when the component is REMOVED from the DOM.

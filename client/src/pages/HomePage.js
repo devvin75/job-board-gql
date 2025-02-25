@@ -30,7 +30,7 @@ export default HomePage;
 /**The getJobs() function is called inside the useEffect hook for several important reasons:
  * 1.)Asynchronous Data Fetching: 
  *    The getJobs() function is an asynchronous operation that fetches job data from a GraphQL API. 
- *    By placing it inside useEffect, we ensure that the data fetching occurs after the component has mounted.
+ *    -->>By placing it inside useEffect, we ensure that the data fetching occurs after the component has mounted.
  * 
  * 2.)Side Effect Management: 
  *    useEffect is designed to handle side effects in functional components. 

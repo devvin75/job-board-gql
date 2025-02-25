@@ -1,20 +1,73 @@
 #the graphql extension tells the editor that this is GraphQl Schema definition language file
 
-#is a special object type that defines all the "read-only" entry points for your API.
-#This is where you specify all the queries that clients can execute to fetch data. 
-type Query {
-    #FETCH A "SINGLE" job
-    #id is the name of the argument and ID! is the type and Job is the return type
-    job(id: ID!): Job 
-    jobs:[Job!]
-   
+#In essence, your schema defines the contracts for how clients can interact with your GraphQL API.
+#It specifies the available queries, the types of data they can request, 
+#and the structure of the data that will be returned.. 
+type Query {    
+    #Returns a list of job objects (Non-Nullable)
+    #[ ] is known as a list type.
+    #jobs is a field
+    jobs:[Job!] #List of job entries
+    ######################################################################################################
+    #The job query is defined as taking an argument id of type ID (non-nullable)
+    #and returning a Job object.
+    job(id: ID!): Job #Specific job entry
+    
+    #NOTE
+    #1.)Objects are collections of fields. 
+    #   --Each field has a specific type.
+    #2.)Lists ([]) allow you to represent a collection of values of the same type.
+    ####################################################################################################### 
+    #The company(id: ID!): Company declaration inside the Query object in the GraphQL schema
+    #is used to define a query operation that "clients" can perform to retrieve a specific company by its ID.
+    
+    #This is similar to how the job(id: ID!): 
+    #Job query is defined to retrieve a specific job by its ID.
+    #The company(id: ID!): 
+    #Company declaration specifies that the company query takes an argument id of type ID! 
+    #(a non-nullable ID) and returns a Company object. 
+    #This means that when a client executes the company query with a valid ID, they will receive 
+    #the corresponding company's details.
+
+    #By declaring the company query inside the Query object, you are defining a way for clients 
+    #to fetch company information directly. 
+    
+    #By declaring the company query inside the Query object, you are defining a way for clients 
+    #to fetch company information directly. 
+    
+    #This is useful when you want to retrieve company details independently, without needing to go through a job first. 
+    #It also allows clients to fetch the associated job listings for a company when needed.
+    company(id: ID!): Company
 }
 
 """Custom object type """
+#Types like Company are object types that define the shape of the data, 
+#while Query defines how to access that data.
+#
+#Think of it this way:
+#1.)type Comnpany defines what a company looks like(its structure/schema)
+#2.)type Query defines how to fetch companies(the operations) 
+# Ex to illustrate
+
+# Define the structure of a Company
+#   type Company {
+#     id: ID!
+#     name: String!
+#     employees: Int
+#     location: String
+#   }
+
+# Define how to query Companies
+# type Query {
+#   getCompany(id: ID!): Company    # Returns a single company
+#   getAllCompanies: [Company]      # Returns an array of companies
+# }
+###############################################################################
 type Company{
     id: ID!
     name: String!
     description: String
+    jobs:[Job!] #returns a list of jobs
 }
 
 """
@@ -25,14 +78,37 @@ Associate each job with the company
 #Think of it as a blueprint for a job.
 type Job {
     id:ID!     
-    title: String!
+    title: String! 
     company: Company!
-    """ This is called a documentation comment"""
+    
     # If type is int, its going to be converted to a very long number that is very difficult to read.
     # String is formatting the date according to the ISO standard. (ISO 8601)    
     date: String! 
     description: String
 }
 
+# NOTE:
+# """ This is called a documentation comment"""
+
+#Query (Menu)
+# └── jobs (Get all jobs)
+#       └── Job (Job details)
+#            └── Company (Company details)
 
 
+#####################################################
+#Real-world Analogy It's like a job board website:
+
+#1.)Query: The search bar and filters
+
+#2.)Job: The job posting format
+
+#3Company: The company profile format
+####################################################
+
+#####################################################
+#type Query {
+ #   jobs: [Job!]       # Like asking "Show me all books in the library"
+ #   job(id: ID!): Job  # Like asking "Find me book number ABC123"
+#}
+################################################

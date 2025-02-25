@@ -6,9 +6,20 @@
  * better performance and clarity.
  */
 
+/**APOLLO SERVER
+ * --is an open-source, production-ready "GraphQL server framework".
+ * --It provides a robust foundation for building and managing GraphQL APIs. 
+ */
 import {ApolloServer} from '@apollo/server';
 // cors package which helps manage Cross-Origin Resource Sharing(CORS).
 import cors from 'cors';
+/**This import statement is used to "integrate" Apollo server with Express.js,
+ * allowing Apollo Server to handle GraphQl requests in an Express.js
+ * ->> It takes an instance of Apollo Server as an argument and returns an Express.js
+ * middleware function.
+ * This middleware function can be used in an Express.js application to handle
+ * GraphQL requests. 
+ */
 import {expressMiddleware as apolloMiddleware} from '@apollo/server/express4'
 import express from 'express';
 import { authMiddleware, handleLogin } from './auth.js';
@@ -27,10 +38,12 @@ app.use(cors(), express.json(), authMiddleware);
 // Defines a route for handling 
 app.post('/login', handleLogin);
 
-// Read schema file
+// Read schema file async
+/**This means that the server can start reading the file in the background while it continues to execute other code. 
+  This can lead to better performance and responsiveness, especially if the file is large or if the disk is slow. */
 const typeDefs = await readFile('./schema.graphql', 'utf-8');
 
-// Create Apollo Server
+// CREATE APOLLO SERVER
 const apolloServer = new ApolloServer({typeDefs, resolvers});
 
 // A method in Apollo Server that initiates the server and begins listening for incoming GraphQL requests

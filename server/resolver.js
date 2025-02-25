@@ -1,27 +1,74 @@
 /**Resolvers are responsble for fetching the data for "EACH" field in the schema */
 
-import {getJobs, getJob} from './db/jobs.js';
+import {getJobs, getJob, getJobsByCompany} from './db/jobs.js';
 import {getCompany} from './db/companies.js'; // replace with actual company logic
 
 export const resolvers = {
     Query:{
-        /**root: often called parent or obj
-         * represents the result returned from the resolver on the parent field
-         * the args parameter has beed destructured to {id}         */
-        job: (_root, {id}) => getJob(id),
-            // console.log('[Query.job] args: ', id);   
+        /**root parameter in GraphQL contains the result from the parent resolver.
+         * the args argument has beed destructured to {id}         */
+        job: (_root, {id}) => getJob(id),           
         jobs: () => getJobs(),
+        
+        /**The company field under Job is for retrieving the associated company when 
+         * you already have a Job object. 
+         * It's used when you're traversing from a job to its company.
+         * -------------------------------------------------------------------
+         * The company query in the Query type is for directly looking up a company 
+         * by its ID, without needing to go through a job first. 
+         * 
+         * This is useful when you:
+         * 1.)Need to fetch company details DIRECTLY without having a job reference
+         * 2.)Want to get company information independently
+         * 3.)Need to build UI components that focus on company details only */
+        company: (_root, {id}) => getCompany(id)        
     },
+
+    Company: {
+        jobs: (company) =>  getJobsByCompany(company.id)
+        },        
+    
 
     Job: {
         // The important thing is that the database has exactly the same fields 
         // as defined in schema id, name and description
-        // return getCompany() // replace with actual company logic
-        company: (job) =>  getCompany(job.companyId),         
+        /**This is what the arg should look like parent or root
+         * company: (parent) => {
+            // parent is the Job object
+            // parent.companyId can be used to fetch the company
+            // return getCompany(parent.companyId) 
+            
+            In GraphQL, when you have nested fields, the parent field's resolved value
+             becomes available as the first argument 
+             (commonly known as the parent or source argument) to the child field's resolver.  
+            Ex:
+            query {
+              job {
+                id
+                title
+                company {
+                  name
+                }
+              }
+            }
+            1.)A parent resolver would resolve the job field, return a job object
+            2.)Then the company resolver "receives" that job object as it's first argument
+            3.)The resolver uses job.companyId to fetch the associated company 
+               using the getCompany function. 
+
+             // console.log('job value:', job)
+            job parameter value:
+            job value: {
+                id: 'f3YzmnBZpK0o',
+                companyId: 'FjcJCHJALA4i',
+                title: 'Frontend Developer',
+                description: 'We are looking for a Frontend Developer familiar with React.',
+                createdAt: '2024-01-26T11:00:00.000Z' **/
+        company: (job) => getCompany(job.companyId), 
+                 
         
         // job argument see comment below
-        date: (job) => {
-            // console.log('resolving date for job: ', job);
+        date: (job) => {           
             //  job.createdAt.slice(0, 'yyyy-mm-dd'.length); // replace with actual date logic
             return toIsoDate(job.createdAt)
         }
@@ -33,65 +80,27 @@ function toIsoDate(value){
     return value.slice(0, 'yyyy-mm-dd'.length)
 }
 
-/**job argument 
- * The job argument in the date resolver comes from the "parent" resolver that returns the job object.`
+/**ARGUMENTS HANDLING
+ * Resolvers can process arguments passed in queries
  * 
- * 1.)In GraphQL, resolvers are organized in "hierarchical" structure that mirrors the stucture of your GraphQL schema.
+ * Each resolver function receives four arguments
+ * 1.)parent
+ *    --the result of the previous resolver call
+ * 2.)args
+ *    --the arguments provided to the field
+ * 3.)context
+ *    --a shared context object(often contains authentication info,database connections)
+ * 4.)info
+ *    --information about the execution state of the query.
  * 
- * 2.)When a query is executed, GraphQL starts calling the top-level resolvers (in this case, the jobs resolver in the Query object)
- * 
- * 3.)The jobs resolver calls getJobs() which presumably returns an array of job objects.
- * 
- * 4.)For each job object in this array, GraphQL will then call the resolvers for any fields that are "explicitly defined in the Job
- *    object in your resolver map. 
- * 
- * 5.) In this case, you have a resolver for the date field of Job type.
- *     GraphQL automatically passes the parent object (the job object returned by GetJobs()) as the first argument to the date resolver.
- * 
- * NOTE
- * So the job argument is NOT explicitly passed by you in the code. 
- * It is automatically provided by the GraphQL execution engine when it calls the date resolver for each job object.
- */
-
-/**ROOT FIELS AND RESOLVERS 
- * I.Understanding the Query Root Operation Type
-     Think of it as the "main entrance" to your GraphQL API.
-     In a GraphQL API, the Query root operation type is a SPECIAL object type that serves as the starting point for all your queries.
-     It defines the top-level fields that you can query.
-
-    Here's a simple analogy:
-    Imagine a library. The library's main entrance is like the Query root operation type.
-    Once you enter, you can access different sections (like fiction, non-fiction, or reference).
-    These sections represent the fields of the Query type.
-
-    A Concrete Example:
-    Let's consider a simple e-commerce API. 
-    
-    The Query type might look like this:
-    
-    type Query {
-        products(category: String): [Product]
-        product(id: ID!): Product
-        categories: [String]
+ * Every resolver function receives four arguments in this order:
+ *  fieldResolver(parent, args, context, info) {
+        // resolver implementation
     }
 
-    In this example, the Query type has three fields:
-    1.)products: This field allows you to fetch a list of products, optionally filtered by category.
-    2.)product: This field allows you to fetch a specific product by its ID.
-    3.)categories: This field returns a list of all available product categories.
+    KEYPOINT
+    --argument must be defined in the schema before you can use them
 
 
-    When you send a GraphQL query, you start by specifying the Query type and then drill down into the desired fields:
-    This query will fetch all products in the "electronics" category and return their IDs, names, and prices.
+ */
 
-    Key Points to Remember:
-    1.)The Query type is the root of your GraphQL schema.
-    2.)It defines the entry points for your API.
-    3.)By traversing the fields of the Query type, you can access the underlying data.
-
-    The Query type is often the only required root operation type in a GraphQL API.
-    By understanding the concept of the Query root operation type, you can effectively design and query your GraphQL APIs 
-    to fetch the exact data you need.
-
- * 
-*/

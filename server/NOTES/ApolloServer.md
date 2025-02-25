@@ -22,6 +22,6 @@ start() method
   which can use to access information about the server, such as its URL or configuration.
 
 NOTE:
- an instance of Apollo Server is createdd with the define typeDefs(Schema) and resolvers.
+ an instance of Apollo Server is created with the define typeDefs(Schema) and resolvers.
 
    const server = new ApolloServer({ typeDefs, resolvers  });
